@@ -1,0 +1,73 @@
+#include "gtest/gtest.h"
+#include <vector>
+#include <algorithm>
+
+enum Faculty { CS, PI, TN, INF, ME };
+
+struct Student {
+    int id;
+    std::string name;
+    int group;
+    Faculty faculty;
+    int mark1;
+    int mark2;
+    int mark3;
+};
+
+void sortPhysical(std::vector<Student>& s) {
+    std::sort(s.begin(), s.end(), [](const Student& a, const Student& b){
+        return a.name < b.name;
+    });
+}
+
+std::vector<int> buildIndexArray(const std::vector<Student>& s) {
+    std::vector<int> idx(s.size());
+    for (int i = 0; i < s.size(); ++i) idx[i] = i;
+    std::sort(idx.begin(), idx.end(), [&s](int a, int b){
+        return s[a].name < s[b].name;
+    });
+    return idx;
+}
+
+int binarySearch(const std::vector<Student>& s, const std::string& name, int group, int mark1) {
+    for (int i = 0; i < s.size(); ++i) {
+        if (s[i].name == name && s[i].group == group && s[i].mark1 == mark1)
+            return i;
+    }
+    return -1;
+}
+
+TEST(StudentTest, SortPhysicalTest) {
+    std::vector<Student> s = {
+        {1,"C",1,CS,5,5,5},
+        {2,"A",1,CS,5,5,5},
+        {3,"B",1,CS,5,5,5}
+    };
+    sortPhysical(s);
+    EXPECT_EQ(s[0].name, "A");
+    EXPECT_EQ(s[1].name, "B");
+    EXPECT_EQ(s[2].name, "C");
+}
+
+TEST(StudentTest, IndexArrayTest) {
+    std::vector<Student> s = {
+        {1,"C",1,CS,5,5,5},
+        {2,"A",1,CS,5,5,5},
+        {3,"B",1,CS,5,5,5}
+    };
+    auto idx = buildIndexArray(s);
+    EXPECT_EQ(idx[0], 1); // A
+    EXPECT_EQ(idx[1], 2); // B
+    EXPECT_EQ(idx[2], 0); // C
+}
+
+TEST(StudentTest, BinarySearchTest) {
+    std::vector<Student> s = {
+        {1,"Alice",1,CS,5,5,5},
+        {2,"Bob",2,PI,4,4,4}
+    };
+    EXPECT_EQ(binarySearch(s,"Alice",1,5),0);
+    EXPECT_EQ(binarySearch(s,"Bob",2,4),1);
+    EXPECT_EQ(binarySearch(s,"Charlie",3,3),-1);
+}
+
